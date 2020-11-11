@@ -1,40 +1,45 @@
 # October 31st 2020—David Mason
-# Selecting random assortments of seeds for each site
+# Code for selecting random assortments of seeds for each site
 # Set up ####
+library(dplyr)
+
 species <- c('wheat', 'rye', 'brown top millet', 'white millet', 'oats', 
-						 'corn', 'sunflower', 'barely', 'safflower', 'peanuts', 'nyjer',
-						 'grubs')
+						 'corn', 'sunflower', 'mealworm', 'safflower', 'peanuts', 'nyjer',
+						 'soldier')
 
 set.seed(34)
-
 # Make function to generate a site ####
 sel_spec <- function(species){
+		# four traps per site, up to 12 species
 		site_feeders <- matrix(nrow = 4, ncol = 12)
-		colnames(site_feeders) <- paste0((seq(1,12,1)), c("st", "nd", "rd", rep("th", 9)))
+		# name the columns
+		colnames(site_feeders) <- paste0((seq(1,12,1)), c("st", "nd", "rd", rep("th", 9))) #
+		# select four species for the low richness treatment
 		site_feeders[2, 1:4] <- sample(species, 4)
+		# select eight species for the low richness treatment
 		site_feeders[3, 1:8] <- sample(species, 8)
+		# select twelve species for the low richness treatment
 		site_feeders[4, 1:12] <- sample(species, 12)
 		return(site_feeders)
 		}
-
 # For loop to create 10 sites ####
 # Create empty list to store vectors
-all_feeders <- list()
-n <- c(1:10)
-
-# Create n vectors of random numbers - length 10. This works ok.
-
+all_feeders <- list() # create a list to store all sites
+n <- c(1:10) # create a sequence for the loop
 for(i in n){
-	site_name <- paste('Site', i, sep = '')
-	assign(site_name, sel_spec(species))
-	all_feeders[[i]]<-get(site_name)
+	site_name <- paste('Site', i, sep = '') # name each site
+	assign(site_name, sel_spec(species)) # run the species selecting function
+	all_feeders[[i]]<-get(site_name) # get all the sites in the list
 	}
 
-# Convert the list to a dataframe ####
-Site_1 <- as.data.frame(all_feeders[[1]])
-Site_1$Site <- as.character(c("1"))
-Site_1$Feeder <- c("Empty", "Low", "Medium", "High")
-Site_1 <- select(Site_1, Site, Feeder, everything())
+# Convert the list to  dataframes ####
+# This is where my code gets a REALLY clunky. I was struggling to get the list
+# of sites into a readable format. I ended up just pulling them one at a time.
+
+Site_1 <- as.data.frame(all_feeders[[1]]) # pull and convert
+Site_1$Site <- as.character(c("1")) # add value for site column
+Site_1$Feeder <- c("Empty", "Low", "Medium", "High") # add values for feeder
+Site_1 <- select(Site_1, Site, Feeder, everything()) # reorder columns
 
 Site_2 <- as.data.frame(all_feeders[[2]])
 Site_2$Site <- as.character(c("2"))
